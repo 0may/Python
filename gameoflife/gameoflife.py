@@ -31,6 +31,10 @@
 
 Implementation of Conway's game of life
 https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+
+required modules:
+    pygame   https://pypi.org/project/pygame/
+    numpy    https://pypi.org/project/numpy/
  
 """
 
