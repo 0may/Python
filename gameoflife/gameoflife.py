@@ -49,7 +49,7 @@ def initStates( statesArray ):
   
     for j in range(0, statesArray.shape[0]):
         for i in range(0, statesArray.shape[1]):
-            statesArray[j][i] = random.choice([0,1])
+            statesArray[j][i] = random.choice([0, 0, 0, 0, 1])
     
     return
 
@@ -173,26 +173,41 @@ pg.mouse.set_visible(True)
 
 states       = np.zeros( (numCellsY, numCellsX), dtype=np.uint8 )
 statesBuffer = np.zeros( (numCellsY, numCellsX), dtype=np.uint8 )
-neighbors    = np.zeros((numCellsY, numCellsX), dtype=np.uint8)
+neighbors    = np.zeros((numCellsY, numCellsX), dtype=np.uint8 )
 
 initStates(states)
 
+mousePressed = False
 
 while 1:
     for event in pg.event.get():
-        if event.type == pg.QUIT: sys.exit()
+        if event.type == pg.QUIT: 
+            sys.exit()
+        if event.type == pg.MOUSEBUTTONDOWN:   # add new ant on mouse click
+            mousePressed = True
+        if event.type == pg.MOUSEBUTTONUP:
+            mousePressed = False
 
+    if mousePressed:
+        pos = pg.mouse.get_pos()
+        if states[(int)(pos[1]/cellSize), (int)(pos[0]/cellSize)] == 0:
+            states[(int)(pos[1]/cellSize), (int)(pos[0]/cellSize)] = 1
+        
+       # sleep(0.1)
 
-    drawStates(states)
-    
-   # sleep(0.05)
-    
-    # updateStates(states, statesBuffer)
-    updateStatesFast(states, statesBuffer, neighbors)
-    
-    tmp = states
-    states = statesBuffer
-    statesBuffer = tmp
-    
+        drawStates(states)
+    else:
+
+        drawStates(states)
+        
+        #sleep(0.1)
+        
+        # updateStates(states, statesBuffer)
+        updateStatesFast(states, statesBuffer, neighbors)
+        
+        tmp = states
+        states = statesBuffer
+        statesBuffer = tmp
+        
     pg.display.flip()
 
