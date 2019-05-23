@@ -70,6 +70,9 @@ class Ant:
                 self.dir = self.dir-1
             stage[self.y][self.x] = 0
 
+    # function to move ant to new position after updating direction
+    def move(self, stage):
+
         # update ant's position
         if self.dir == 0:    # go to left
             if self.x == 0:
@@ -92,6 +95,36 @@ class Ant:
     # draw ant at it's position with colorA. call after drawing the stage
     def draw(self):
         pg.draw.rect(screen, colorA, (self.x*cellSize, self.y*cellSize, cellSize, cellSize))
+
+
+# Inverted Ant class derived from Ant class 
+# Overrides the Ant class' update function for a new set of rules while using the implementation of
+# move and draw functions of Ant class
+class InvertedAnt(Ant):
+
+    # constructor. usually calls the constructor of the parent class
+    def __init__(self, xstart, ystart, direction=3):
+        Ant.__init__(self, xstart, ystart, direction)
+
+    # function to update ant direction inversely to the normal ant.
+    # !! Overrides the update function of it's parent class Ant. 
+    def update(self, stage):
+    
+        # update ant's direction and value of the stage under the ant
+        if stage[self.y][self.x] == 0:  
+            
+            if self.dir == 0:
+                self.dir = 3
+            else:
+                self.dir = self.dir-1
+
+            stage[self.y][self.x] = 1
+        else:
+            self.dir = (self.dir+1) % 4
+            
+            stage[self.y][self.x] = 0
+
+
 
 
 # draw the stage with color0 for stage value = 0 and color1 for stage value = 1
@@ -126,27 +159,35 @@ pg.mouse.set_visible(True)
 theStage = np.zeros( (numCellsY, numCellsX), dtype=np.uint8 )
 
 # one ant
-# ants = [Ant(50, 50)]
+ants = [Ant(50, 50)]
 
-# two ants evolving backward after a time
-# ants = [Ant(50, 50), Ant(40,23), Ant(10, 43), Ant(60, 20), Ant(74, 83)] 
+# multiple ants with different starting directions
+# ants = [Ant(50, 50), Ant(40,23), Ant(10, 43, 1), Ant(60, 20, 2), Ant(74, 83, 0)] 
 
+# one Ant and one InvertedAnt
+# ants = [Ant(25, 50), InvertedAnt(75, 50)]
 
-ants = [Ant(50, 50), Ant(40,23), Ant(10, 43, 1), Ant(60, 20, 2), Ant(74, 83, 0)] 
 
 while 1:
+
+    # process pygame events
     for event in pg.event.get():
+
+        # exit app
         if event.type == pg.QUIT: 
             sys.exit()
-        if event.type == pg.MOUSEBUTTONUP:   # add new ant on mouse click
+
+        # add new ant on mouse click
+        if event.type == pg.MOUSEBUTTONUP: 
             pos = pg.mouse.get_pos()
             ants.append(Ant((int)(pos[0]/cellSize), (int)(pos[1]/cellSize)))
 
     drawStage(theStage)
     
-    for a in ants:
-        a.update(theStage)
-        a.draw()
+    for ant in ants:
+        ant.update(theStage)
+        ant.move(theStage)
+        ant.draw()
     
     pg.display.flip()
 
